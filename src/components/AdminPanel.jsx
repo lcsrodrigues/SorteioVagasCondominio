@@ -3,12 +3,11 @@ import { Button } from '@/components/ui/button.jsx';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx';
 import { Input } from '@/components/ui/input.jsx';
 import { Label } from '@/components/ui/label.jsx';
-import { Car, Download, Eye, RotateCcw, Shuffle, Users } from 'lucide-react';
+import { Car, Eye, RotateCcw, Shuffle, Users } from 'lucide-react';
 import { useState } from 'react';
 import { useSorteioContext } from '../context/SorteioContext';
 import { useExcelReader } from '../hooks/useExcelReader';
 // import { loadTestData } from '../utils/testData';
-import * as XLSX from 'xlsx';
 
 const AdminPanel = ({ onViewResults }) => {
   const [message, setMessage] = useState('');
@@ -19,9 +18,9 @@ const AdminPanel = ({ onViewResults }) => {
     vagas,
     carregarApartamentos,
     carregarVagas,
-    realizarSorteio,
+    // realizarSorteio,
     resetarSorteio,
-    exportarResultados,
+    // exportarResultados,
     getEstatisticas,
     sorteioRealizado
   } = useSorteioContext();
@@ -53,41 +52,44 @@ const AdminPanel = ({ onViewResults }) => {
   // const handleLoadTestData = () => {
   //   try {
   //     const resultado = loadTestData(carregarApartamentos, carregarVagas);
-  //     showMessage(`Dados de teste carregados! ${resultado.apartamentos} apartamentos e ${resultado.vagas} vagas.`, 'success');
+  //     showMessage(
+  //       `Dados de teste carregados! ${resultado.apartamentos} apartamentos e ${resultado.vagas} vagas.`,
+  //       'success'
+  //     );
   //   } catch (error) {
   //     showMessage(`Erro ao carregar dados de teste: ${error.message}`, 'error');
   //   }
   // };
 
-  const handleSorteio = () => {
-    try {
-      const resultado = realizarSorteio();
-      showMessage(`Sorteio realizado com sucesso! ${resultado.vagasSorteadas} vagas foram sorteadas.`, 'success');
-    } catch (error) {
-      showMessage(`Erro ao realizar sorteio: ${error.message}`, 'error');
-    }
-  };
+  // const handleSorteio = () => {
+  //   try {
+  //     const resultado = realizarSorteio();
+  //     showMessage(`Sorteio realizado com sucesso! ${resultado.vagasSorteadas} vagas foram sorteadas.`, 'success');
+  //   } catch (error) {
+  //     showMessage(`Erro ao realizar sorteio: ${error.message}`, 'error');
+  //   }
+  // };
 
   const handleReset = () => {
     resetarSorteio();
     showMessage('Sorteio resetado com sucesso!', 'success');
   };
 
-  const handleExport = () => {
-    try {
-      const dados = exportarResultados();
-      const worksheet = XLSX.utils.json_to_sheet(dados);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Resultados do Sorteio');
+  // const handleExport = () => {
+  //   try {
+  //     const dados = exportarResultados();
+  //     const worksheet = XLSX.utils.json_to_sheet(dados);
+  //     const workbook = XLSX.utils.book_new();
+  //     XLSX.utils.book_append_sheet(workbook, worksheet, 'Resultados do Sorteio');
 
-      const fileName = `sorteio_vagas_${new Date().toISOString().split('T')[0]}.xlsx`;
-      XLSX.writeFile(workbook, fileName);
+  //     const fileName = `sorteio_vagas_${new Date().toISOString().split('T')[0]}.xlsx`;
+  //     XLSX.writeFile(workbook, fileName);
 
-      showMessage('Resultados exportados com sucesso!', 'success');
-    } catch (error) {
-      showMessage(`Erro ao exportar: ${error.message}`, 'error');
-    }
-  };
+  //     showMessage('Resultados exportados com sucesso!', 'success');
+  //   } catch (error) {
+  //     showMessage(`Erro ao exportar: ${error.message}`, 'error');
+  //   }
+  // };
 
   const estatisticas = getEstatisticas();
 
@@ -123,26 +125,25 @@ const AdminPanel = ({ onViewResults }) => {
       )}
 
       {/* Botão para carregar dados de teste 
-      
-      <Card className="border-yellow-200 bg-yellow-50">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
+      <Card className='border-yellow-200 bg-yellow-50'>
+        <CardContent className='pt-6'>
+          <div className='flex items-center justify-between'>
             <div>
-              <h3 className="font-semibold text-yellow-800">Dados de Teste</h3>
-              <p className="text-sm text-yellow-700">Carregue dados de exemplo para testar o sistema</p>
+              <h3 className='font-semibold text-yellow-800'>Dados de Teste</h3>
+              <p className='text-sm text-yellow-700'>Carregue dados de exemplo para testar o sistema</p>
             </div>
-            <Button 
+            <Button
               onClick={handleLoadTestData}
-              variant="outline"
-              className="flex items-center gap-2 border-yellow-300 text-yellow-800 hover:bg-yellow-100"
+              variant='outline'
+              className='flex items-center gap-2 border-yellow-300 text-yellow-800 hover:bg-yellow-100'
             >
-              <TestTube className="h-4 w-4" />
+              <TestTube className='h-4 w-4' />
               Carregar Dados de Teste
             </Button>
           </div>
         </CardContent>
-      </Card>
-*/}
+      </Card>*/}
+
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
         {/* Upload de Moradores */}
         <Card>
@@ -204,19 +205,10 @@ const AdminPanel = ({ onViewResults }) => {
             <Shuffle className='h-5 w-5' />
             Controle do Sorteio
           </CardTitle>
-          <CardDescription>Realize o sorteio das vagas ou visualize os resultados</CardDescription>
+          <CardDescription>Gerencie o sorteio das vagas e visualize os resultados</CardDescription>
         </CardHeader>
         <CardContent>
           <div className='flex flex-wrap gap-4'>
-            <Button
-              onClick={handleSorteio}
-              disabled={excelLoading || apartamentos.length === 0 || vagas.length === 0}
-              className='flex items-center gap-2'
-            >
-              <Shuffle className='h-4 w-4' />
-              Realizar Sorteio
-            </Button>
-
             <Button
               onClick={handleReset}
               disabled={excelLoading || !sorteioRealizado}
@@ -230,16 +222,6 @@ const AdminPanel = ({ onViewResults }) => {
             <Button onClick={onViewResults} variant='secondary' className='flex items-center gap-2'>
               <Eye className='h-4 w-4' />
               Ver Resultados
-            </Button>
-
-            <Button
-              onClick={handleExport}
-              disabled={!sorteioRealizado}
-              variant='outline'
-              className='flex items-center gap-2'
-            >
-              <Download className='h-4 w-4' />
-              Exportar Resultados
             </Button>
           </div>
         </CardContent>

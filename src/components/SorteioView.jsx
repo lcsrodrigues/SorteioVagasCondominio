@@ -2,11 +2,20 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx';
 import { Badge } from '@/components/ui/badge.jsx';
 import { Button } from '@/components/ui/button.jsx';
-import { Car, Building, MapPin, Settings, Clock } from 'lucide-react';
+import { Car, Building, MapPin, Settings, Clock, Shuffle, Download } from 'lucide-react';
 import { useSorteioContext } from '../context/SorteioContext';
+import * as XLSX from 'xlsx';
 
 const SorteioView = ({ onShowAdmin }) => {
-  const { resultados, getEstatisticas, sorteioRealizado } = useSorteioContext();
+  const { 
+    resultados, 
+    getEstatisticas, 
+    sorteioRealizado, 
+    realizarSorteio, 
+    exportarResultados, 
+    apartamentos, 
+    vagas 
+  } = useSorteioContext();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -38,6 +47,33 @@ const SorteioView = ({ onShowAdmin }) => {
     });
   };
 
+  const handleSorteio = () => {
+    try {
+      realizarSorteio();
+      // No need for message here, as the view will update automatically
+    } catch (error) {
+      console.error(`Erro ao realizar sorteio: ${error.message}`);
+      alert(`Erro ao realizar sorteio: ${error.message}`);
+    }
+  };
+
+  const handleExport = () => {
+    try {
+      const dados = exportarResultados();
+      const worksheet = XLSX.utils.json_to_sheet(dados);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Resultados do Sorteio');
+      
+      const fileName = `sorteio_vagas_${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+      
+      // No need for message here
+    } catch (error) {
+      console.error(`Erro ao exportar: ${error.message}`);
+      alert(`Erro ao exportar: ${error.message}`);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -65,6 +101,27 @@ const SorteioView = ({ onShowAdmin }) => {
           className="absolute top-0 right-0 opacity-30 hover:opacity-100 transition-opacity"
         >
           <Settings className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Botões de Ação */}
+      <div className="flex flex-wrap justify-center gap-4 mb-8">
+        <Button 
+          onClick={handleSorteio} 
+          disabled={apartamentos.length === 0 || vagas.length === 0}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          <Shuffle className="h-4 w-4" />
+          Realizar Sorteio
+        </Button>
+        <Button 
+          onClick={handleExport} 
+          disabled={!sorteioRealizado}
+          variant="outline"
+          className="flex items-center gap-2 border-blue-600 text-blue-600 hover:bg-blue-50"
+        >
+          <Download className="h-4 w-4" />
+          Exportar Resultados
         </Button>
       </div>
 
@@ -108,7 +165,7 @@ const SorteioView = ({ onShowAdmin }) => {
                 Nenhum sorteio realizado
               </h3>
               <p className="text-gray-500">
-                O sorteio ainda não foi realizado. Aguarde o início do processo.
+                Carregue os arquivos de moradores e vagas na área administrativa (clique no ícone de engrenagem no canto superior direito) e clique em "Realizar Sorteio".
               </p>
             </div>
           </CardContent>
@@ -128,7 +185,7 @@ const SorteioView = ({ onShowAdmin }) => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
                   {vagasSorteadas.map((resultado) => (
                     <Card key={resultado.vagaNumero} className="border-l-4 border-l-blue-500">
                       <CardContent className="pt-4">
@@ -176,7 +233,7 @@ const SorteioView = ({ onShowAdmin }) => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
                   {vagasDisponiveis.map((vaga) => (
                     <div
                       key={vaga.vagaNumero}
