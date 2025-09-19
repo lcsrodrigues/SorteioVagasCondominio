@@ -10,10 +10,10 @@ export const useSorteio = () => {
     const apartamentosProcessados = dados.map((item, index) => ({
       id: index + 1,
       numero: item.Apartamento,
-      // Assumindo que todos os apartamentos podem receber vagas duplas por padrão, 
-      // ou que a elegibilidade para vagas duplas não é uma informação no Excel de moradores.
-      // Se houver uma coluna no Excel de moradores para isso, precisaria ser adicionada aqui.
-      podeReceberVagaDupla: true 
+      // Adicionando uma propriedade para rastrear o tipo de vaga que o apartamento pode receber
+      // Assumimos que todos podem receber dupla, a menos que especificado o contrário no futuro
+      podeReceberVagaDupla: true, 
+      vagasAtribuidas: [] // Para rastrear as vagas atribuídas a cada apartamento
     }));
     setApartamentos(apartamentosProcessados);
     return apartamentosProcessados;
@@ -47,8 +47,9 @@ export const useSorteio = () => {
     }
 
     let novosResultados = [];
-    let apartamentosDisponiveis = [...apartamentos]; // Copia para não modificar o estado original
-    let vagasDisponiveis = [...vagas]; // Copia para não modificar o estado original
+    // Usar um mapa para controlar as vagas atribuídas a cada apartamento
+    const apartamentosComVagas = new Map(apartamentos.map(apt => [apt.numero, { ...apt, vagasAtribuidas: [] }]));
+    let vagasDisponiveis = [...vagas];
 
     // 1. Processar vagas pré-configuradas
     const vagasPreConfiguradas = vagasDisponiveis.filter(vaga => vaga.preConfigurada);
@@ -61,26 +62,28 @@ export const useSorteio = () => {
           apartamentoNumero: vaga.apartamentoAssociado,
           preConfigurada: true
         });
-        // Remover apartamento da lista de disponíveis se já ocupou uma vaga
-        apartamentosDisponiveis = apartamentosDisponiveis.filter(apt => apt.numero !== vaga.apartamentoAssociado);
+        // Registrar a vaga atribuída ao apartamento
+        const apt = apartamentosComVagas.get(vaga.apartamentoAssociado);
+        if (apt) {
+          apt.vagasAtribuidas.push(vaga);
+        }
       }
     });
     vagasDisponiveis = vagasDisponiveis.filter(vaga => !vaga.preConfigurada);
 
     // 2. Separar vagas livres por tipo
-    let vagasDuplasLivres = vagasDisponiveis.filter(vaga => vaga.tipo === 'DUPLA');
-    let vagasUnicasLivres = vagasDisponiveis.filter(vaga => vaga.tipo === 'ÚNICA');
+    let vagasDuplasLivres = vagasDisponiveis.filter(vaga => vaga.tipo === 'DUPLA').sort(() => Math.random() - 0.5);
+    let vagasUnicasLivres = vagasDisponiveis.filter(vaga => vaga.tipo === 'ÚNICA').sort(() => Math.random() - 0.5);
 
-    // 3. Sortear vagas duplas primeiro
-    // Apartamentos que podem receber vaga dupla e ainda não têm uma
-    let aptosParaVagaDupla = apartamentosDisponiveis.filter(apt => apt.podeReceberVagaDupla);
-    aptosParaVagaDupla.sort(() => Math.random() - 0.5); // Embaralhar
+    // 3. Sortear vagas duplas primeiro para apartamentos elegíveis
+    // Filtrar apartamentos que ainda não têm vagas e podem receber dupla
+    let aptosElegiveisParaDupla = Array.from(apartamentosComVagas.values()).filter(apt => 
+      apt.vagasAtribuidas.length === 0 && apt.podeReceberVagaDupla
+    ).sort(() => Math.random() - 0.5);
 
-    let aptosComVagaDupla = new Set();
-
-    while (vagasDuplasLivres.length > 0 && aptosParaVagaDupla.length > 0) {
-      const vaga = vagasDuplasLivres.shift(); // Pega a primeira vaga dupla
-      const apt = aptosParaVagaDupla.shift(); // Pega o primeiro apto elegível
+    while (vagasDuplasLivres.length > 0 && aptosElegiveisParaDupla.length > 0) {
+      const vaga = vagasDuplasLivres.shift();
+      const apt = aptosElegiveisParaDupla.shift();
 
       novosResultados.push({
         vagaNumero: vaga.numero,
@@ -89,29 +92,27 @@ export const useSorteio = () => {
         apartamentoNumero: apt.numero,
         preConfigurada: false
       });
-      aptosComVagaDupla.add(apt.numero);
-      // Remover apto da lista de disponíveis para vagas únicas
-      apartamentosDisponiveis = apartamentosDisponiveis.filter(a => a.numero !== apt.numero);
+      apt.vagasAtribuidas.push(vaga);
     }
 
-    // 4. Lidar com apartamentos que deveriam ter vaga dupla mas não há mais
-    // Esses apartamentos agora serão elegíveis para duas vagas únicas
-    let aptosSemVagaDuplaMasElegiveis = apartamentos.filter(apt => 
-      apt.podeReceberVagaDupla && 
-      !aptosComVagaDupla.has(apt.numero) &&
-      !vagasPreConfiguradas.some(v => v.apartamentoAssociado === apt.numero)
-    );
+    // 4. Sortear vagas únicas para apartamentos restantes
+    // Apartamentos que ainda não têm vagas ou que receberam uma vaga dupla e não podem receber mais
+    // Ou apartamentos que podem receber até duas vagas únicas
+    let aptosParaVagasUnicas = Array.from(apartamentosComVagas.values()).filter(apt => {
+      const numVagas = apt.vagasAtribuidas.length;
+      const temVagaDupla = apt.vagasAtribuidas.some(v => v.tipo === 'DUPLA');
+      const temVagaUnica = apt.vagasAtribuidas.some(v => v.tipo === 'ÚNICA');
 
-    // 5. Sortear vagas únicas
-    // Combinar apartamentos restantes e aqueles que não pegaram vaga dupla
-    let aptosParaVagaUnica = [...apartamentosDisponiveis, ...aptosSemVagaDuplaMasElegiveis];
-    aptosParaVagaUnica.sort(() => Math.random() - 0.5); // Embaralhar
+      // Se já tem uma vaga dupla, não pode receber mais
+      if (temVagaDupla) return false;
+      // Se tem 0 ou 1 vaga única, pode receber mais
+      if (numVagas < 2 && !temVagaDupla) return true;
+      return false;
+    }).sort(() => Math.random() - 0.5);
 
-    let aptosJaComVagaUnica = new Set();
-
-    while (vagasUnicasLivres.length > 0 && aptosParaVagaUnica.length > 0) {
+    while (vagasUnicasLivres.length > 0 && aptosParaVagasUnicas.length > 0) {
       const vaga = vagasUnicasLivres.shift();
-      const apt = aptosParaVagaUnica.shift();
+      const apt = aptosParaVagasUnicas.shift();
 
       novosResultados.push({
         vagaNumero: vaga.numero,
@@ -120,24 +121,15 @@ export const useSorteio = () => {
         apartamentoNumero: apt.numero,
         preConfigurada: false
       });
-      aptosJaComVagaUnica.add(apt.numero);
-    }
+      apt.vagasAtribuidas.push(vaga);
 
-    // 6. Atribuir segunda vaga única para apartamentos que não pegaram dupla
-    for (const aptNumero of aptosSemVagaDuplaMasElegiveis) {
-      if (vagasUnicasLivres.length >= 1 && aptosJaComVagaUnica.has(aptNumero.numero)) { // Verifica se já tem uma vaga única
-        const vaga = vagasUnicasLivres.shift();
-        novosResultados.push({
-          vagaNumero: vaga.numero,
-          vagaLocalizacao: vaga.localizacao,
-          vagaTipo: vaga.tipo,
-          apartamentoNumero: aptNumero.numero,
-          preConfigurada: false
-        });
+      // Se o apartamento já tem 2 vagas únicas, remove da lista de elegíveis
+      if (apt.vagasAtribuidas.filter(v => v.tipo === 'ÚNICA').length >= 2) {
+        aptosParaVagasUnicas = aptosParaVagasUnicas.filter(a => a.numero !== apt.numero);
       }
     }
 
-    // Adicionar vagas que sobraram (não sorteadas)
+    // 5. Adicionar vagas que sobraram (não sorteadas)
     vagasDuplasLivres.forEach(vaga => {
       novosResultados.push({
         vagaNumero: vaga.numero,

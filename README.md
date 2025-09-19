@@ -91,21 +91,11 @@ O Sistema de Sorteio de Vagas é uma aplicação web desenvolvida em React que p
    - Essas associações não podem ser alteradas pelo sorteio
    - **Importante:** A informação de que uma vaga é pré-configurada não é exibida na interface pública do sorteio, garantindo o sigilo da configuração.
 
-2. **Priorização de Vagas Duplas**
-   - O sorteio prioriza a atribuição de vagas do tipo "DUPLA" para apartamentos elegíveis.
-   - Nenhuma vaga dupla deve sobrar se houver apartamentos elegíveis e disponíveis.
-
-3. **Atribuição de Vagas Únicas para Apartamentos com Direito a Dupla**
-   - Caso um apartamento elegível para vaga dupla não consiga uma vaga dupla (por falta de vagas ou apartamentos), ele terá preferência para receber **duas vagas únicas**.
-   - Isso garante que apartamentos com direito a duas vagas sejam atendidos, mesmo que com vagas de tipo diferente.
-
-4. **Sorteio de Vagas Únicas Restantes**
-   - As vagas únicas remanescentes são sorteadas aleatoriamente entre os apartamentos ainda disponíveis.
-   - Cada apartamento (que não recebeu vaga dupla ou duas vagas únicas) pode receber no máximo uma vaga única.
-
-5. **Validações**
-   - O sistema verifica se há apartamentos suficientes para todas as vagas.
-   - Impede sorteios impossíveis (mais vagas que apartamentos).
+2. **Atribuição de Vagas**
+   - Com exceção dos apartamentos com vagas pré-configuradas, os apartamentos que participam do sorteio comum podem receber no máximo 1 vaga dupla OU no máximo 2 vagas simples.
+   - O sorteio prioriza a atribuição de vagas duplas primeiro.
+   - Se um apartamento tiver direito a uma vaga dupla e não houver mais vagas duplas disponíveis, ele será atribuído a duas vagas únicas, se houver.
+   - Não há problema em sobrar vagas (vagas não atribuídas).
 
 ## 🎨 Interface do Usuário
 

@@ -52,10 +52,7 @@ const AdminPanel = ({ onViewResults }) => {
   // const handleLoadTestData = () => {
   //   try {
   //     const resultado = loadTestData(carregarApartamentos, carregarVagas);
-  //     showMessage(
-  //       `Dados de teste carregados! ${resultado.apartamentos} apartamentos e ${resultado.vagas} vagas.`,
-  //       'success'
-  //     );
+  //     showMessage(`Dados de teste carregados! ${resultado.apartamentos} apartamentos e ${resultado.vagas} vagas.`, 'success');
   //   } catch (error) {
   //     showMessage(`Erro ao carregar dados de teste: ${error.message}`, 'error');
   //   }
@@ -125,25 +122,25 @@ const AdminPanel = ({ onViewResults }) => {
       )}
 
       {/* Botão para carregar dados de teste 
-      <Card className='border-yellow-200 bg-yellow-50'>
-        <CardContent className='pt-6'>
-          <div className='flex items-center justify-between'>
+      <Card className="border-yellow-200 bg-yellow-50">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
             <div>
-              <h3 className='font-semibold text-yellow-800'>Dados de Teste</h3>
-              <p className='text-sm text-yellow-700'>Carregue dados de exemplo para testar o sistema</p>
+              <h3 className="font-semibold text-yellow-800">Dados de Teste</h3>
+              <p className="text-sm text-yellow-700">Carregue dados de exemplo para testar o sistema</p>
             </div>
-            <Button
+            <Button 
               onClick={handleLoadTestData}
-              variant='outline'
-              className='flex items-center gap-2 border-yellow-300 text-yellow-800 hover:bg-yellow-100'
+              variant="outline"
+              className="flex items-center gap-2 border-yellow-300 text-yellow-800 hover:bg-yellow-100"
             >
-              <TestTube className='h-4 w-4' />
+              <TestTube className="h-4 w-4" />
               Carregar Dados de Teste
             </Button>
           </div>
         </CardContent>
-      </Card>*/}
-
+      </Card>
+*/}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
         {/* Upload de Moradores */}
         <Card>
