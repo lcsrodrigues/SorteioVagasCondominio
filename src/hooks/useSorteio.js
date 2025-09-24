@@ -6,14 +6,62 @@ export const useSorteio = () => {
   const [resultados, setResultados] = useState([]);
   const [sorteioRealizado, setSorteioRealizado] = useState(false);
 
+  const carregarDadosUnificados = (dados) => {
+    try {
+      // Extrair apartamentos únicos da coluna 'Apartamentos'
+      const apartamentosUnicos = [...new Set(dados.map(item => item.Apartamentos).filter(apt => apt != null))];
+      const apartamentosProcessados = apartamentosUnicos.map((numero, index) => ({
+        id: index + 1,
+        numero: numero,
+        vagasAtribuidas: []
+      }));
+
+      // Processar vagas
+      const vagasProcessadas = dados.map((item, index) => {
+        const preConfigurada = item['Pré-Selecionada'] === 'SIM';
+        let apartamentoAssociado = null;
+        
+        if (preConfigurada && item['Apartamentos Elegíveis']) {
+          apartamentoAssociado = parseFloat(item['Apartamentos Elegíveis']);
+        }
+
+        return {
+          id: index + 1,
+          numero: item['Número da vaga'],
+          localizacao: item['Localização'],
+          tipo: item['Tipo de Vaga'], // 'DUPLA' ou 'ÚNICA'
+          preConfigurada,
+          apartamentoAssociado
+        };
+      });
+
+      console.log('Dados unificados processados:', {
+        apartamentos: apartamentosProcessados.length,
+        vagas: vagasProcessadas.length,
+        vagasPreConfiguradas: vagasProcessadas.filter(v => v.preConfigurada).length
+      });
+
+      setApartamentos(apartamentosProcessados);
+      setVagas(vagasProcessadas);
+      setResultados([]); // Reset resultados
+      setSorteioRealizado(false);
+
+      return {
+        apartamentos: apartamentosProcessados.length,
+        vagas: vagasProcessadas.length,
+        vagasPreConfiguradas: vagasProcessadas.filter(v => v.preConfigurada).length
+      };
+    } catch (error) {
+      console.error('Erro ao carregar dados unificados:', error);
+      throw new Error('Erro ao processar dados do arquivo');
+    }
+  };
+
   const carregarApartamentos = (dados) => {
     const apartamentosProcessados = dados.map((item, index) => ({
       id: index + 1,
       numero: item.Apartamento,
-      // Adicionando uma propriedade para rastrear o tipo de vaga que o apartamento pode receber
-      // Assumimos que todos podem receber dupla, a menos que especificado o contrário no futuro
-      podeReceberVagaDupla: true, 
-      vagasAtribuidas: [] // Para rastrear as vagas atribuídas a cada apartamento
+      vagasAtribuidas: []
     }));
     setApartamentos(apartamentosProcessados);
     return apartamentosProcessados;
@@ -32,7 +80,7 @@ export const useSorteio = () => {
         id: index + 1,
         numero: item['Número da Vaga'],
         localizacao: item['Localização'],
-        tipo: item['Tipo de Vaga'], // 'DUPLA' ou 'ÚNICA'
+        tipo: item['Tipo de Vaga'],
         preConfigurada,
         apartamentoAssociado
       };
@@ -47,14 +95,25 @@ export const useSorteio = () => {
     }
 
     let novosResultados = [];
-    // Usar um mapa para controlar as vagas atribuídas a cada apartamento
     const apartamentosComVagas = new Map(apartamentos.map(apt => [apt.numero, { ...apt, vagasAtribuidas: [] }]));
     let vagasDisponiveis = [...vagas];
 
-    // 1. Processar vagas pré-configuradas
+    // 1. Processar vagas pré-configuradas APENAS para seus apartamentos específicos
     const vagasPreConfiguradas = vagasDisponiveis.filter(vaga => vaga.preConfigurada);
+    const apartamentosComRegras = new Set();
+
     vagasPreConfiguradas.forEach(vaga => {
       if (vaga.apartamentoAssociado) {
+        // Verificar se o apartamento existe
+        const apt = apartamentosComVagas.get(vaga.apartamentoAssociado);
+        if (!apt) {
+          console.warn(`Apartamento ${vaga.apartamentoAssociado} não encontrado para vaga pré-configurada ${vaga.numero}`);
+          return; // Pular esta vaga se o apartamento não existir
+        }
+
+        // Marcar apartamento como tendo regras
+        apartamentosComRegras.add(vaga.apartamentoAssociado);
+
         novosResultados.push({
           vagaNumero: vaga.numero,
           vagaLocalizacao: vaga.localizacao,
@@ -62,74 +121,102 @@ export const useSorteio = () => {
           apartamentoNumero: vaga.apartamentoAssociado,
           preConfigurada: true
         });
+        
         // Registrar a vaga atribuída ao apartamento
-        const apt = apartamentosComVagas.get(vaga.apartamentoAssociado);
-        if (apt) {
-          apt.vagasAtribuidas.push(vaga);
-        }
+        apt.vagasAtribuidas.push(vaga);
       }
     });
+    
+    // Remover vagas pré-configuradas das disponíveis
     vagasDisponiveis = vagasDisponiveis.filter(vaga => !vaga.preConfigurada);
 
-    // 2. Separar vagas livres por tipo
+    // 2. Separar vagas livres por tipo e embaralhar
     let vagasDuplasLivres = vagasDisponiveis.filter(vaga => vaga.tipo === 'DUPLA').sort(() => Math.random() - 0.5);
     let vagasUnicasLivres = vagasDisponiveis.filter(vaga => vaga.tipo === 'ÚNICA').sort(() => Math.random() - 0.5);
 
-    // 3. Sortear vagas duplas primeiro para apartamentos elegíveis
-    // Filtrar apartamentos que ainda não têm vagas e podem receber dupla
-    let aptosElegiveisParaDupla = Array.from(apartamentosComVagas.values()).filter(apt => 
-      apt.vagasAtribuidas.length === 0 && apt.podeReceberVagaDupla
-    ).sort(() => Math.random() - 0.5);
+    // 3. CORREÇÃO PRINCIPAL: Identificar apenas apartamentos SEM regras que precisam de vagas
+    const apartamentosSemRegras = Array.from(apartamentosComVagas.values()).filter(apt => 
+      !apartamentosComRegras.has(apt.numero)
+    );
 
-    while (vagasDuplasLivres.length > 0 && aptosElegiveisParaDupla.length > 0) {
-      const vaga = vagasDuplasLivres.shift();
-      const apt = aptosElegiveisParaDupla.shift();
-
-      novosResultados.push({
-        vagaNumero: vaga.numero,
-        vagaLocalizacao: vaga.localizacao,
-        vagaTipo: vaga.tipo,
-        apartamentoNumero: apt.numero,
-        preConfigurada: false
-      });
-      apt.vagasAtribuidas.push(vaga);
-    }
-
-    // 4. Sortear vagas únicas para apartamentos restantes
-    // Apartamentos que ainda não têm vagas ou que receberam uma vaga dupla e não podem receber mais
-    // Ou apartamentos que podem receber até duas vagas únicas
-    let aptosParaVagasUnicas = Array.from(apartamentosComVagas.values()).filter(apt => {
+    const apartamentosSemVagas = apartamentosSemRegras.filter(apt => {
       const numVagas = apt.vagasAtribuidas.length;
       const temVagaDupla = apt.vagasAtribuidas.some(v => v.tipo === 'DUPLA');
-      const temVagaUnica = apt.vagasAtribuidas.some(v => v.tipo === 'ÚNICA');
-
-      // Se já tem uma vaga dupla, não pode receber mais
-      if (temVagaDupla) return false;
-      // Se tem 0 ou 1 vaga única, pode receber mais
-      if (numVagas < 2 && !temVagaDupla) return true;
-      return false;
+      const numVagasUnicas = apt.vagasAtribuidas.filter(v => v.tipo === 'ÚNICA').length;
+      
+      // Apartamento precisa de vaga se não tem vaga dupla nem 2 vagas únicas
+      return !(temVagaDupla || numVagasUnicas >= 2);
     }).sort(() => Math.random() - 0.5);
 
-    while (vagasUnicasLivres.length > 0 && aptosParaVagasUnicas.length > 0) {
-      const vaga = vagasUnicasLivres.shift();
-      const apt = aptosParaVagasUnicas.shift();
+    console.log('Análise do sorteio:', {
+      totalApartamentos: apartamentos.length,
+      apartamentosComRegras: apartamentosComRegras.size,
+      apartamentosSemRegras: apartamentosSemRegras.length,
+      apartamentosSemVagas: apartamentosSemVagas.length,
+      vagasDuplasDisponiveis: vagasDuplasLivres.length,
+      vagasUnicasDisponiveis: vagasUnicasLivres.length
+    });
 
-      novosResultados.push({
-        vagaNumero: vaga.numero,
-        vagaLocalizacao: vaga.localizacao,
-        vagaTipo: vaga.tipo,
-        apartamentoNumero: apt.numero,
-        preConfigurada: false
-      });
-      apt.vagasAtribuidas.push(vaga);
+    // 4. Verificar se há vagas suficientes para apartamentos SEM regras
+    const apartamentosQueNecessitamVagas = apartamentosSemVagas.length;
+    
+    // Cenário otimista: todos recebem vagas duplas
+    const cenarioOtimista = vagasDuplasLivres.length;
+    // Cenário pessimista: todos recebem 2 vagas únicas
+    const cenarioPessimista = Math.floor(vagasUnicasLivres.length / 2);
+    // Cenário misto: máximo possível
+    const cenarioMisto = vagasDuplasLivres.length + Math.floor(vagasUnicasLivres.length / 2);
+    
+    if (cenarioMisto < apartamentosQueNecessitamVagas) {
+      throw new Error(`Vagas insuficientes! Necessárias no mínimo: ${apartamentosQueNecessitamVagas}, Disponíveis: ${cenarioMisto}. Apartamentos sem vagas: ${apartamentosQueNecessitamVagas}`);
+    }
 
-      // Se o apartamento já tem 2 vagas únicas, remove da lista de elegíveis
-      if (apt.vagasAtribuidas.filter(v => v.tipo === 'ÚNICA').length >= 2) {
-        aptosParaVagasUnicas = aptosParaVagasUnicas.filter(a => a.numero !== apt.numero);
+    // 5. Distribuir vagas para apartamentos sem regras
+    for (const apt of apartamentosSemVagas) {
+      if (vagasDuplasLivres.length > 0) {
+        // Dar uma vaga dupla
+        const vaga = vagasDuplasLivres.shift();
+        novosResultados.push({
+          vagaNumero: vaga.numero,
+          vagaLocalizacao: vaga.localizacao,
+          vagaTipo: vaga.tipo,
+          apartamentoNumero: apt.numero,
+          preConfigurada: false
+        });
+        apt.vagasAtribuidas.push(vaga);
+      } else if (vagasUnicasLivres.length >= 2) {
+        // Dar duas vagas únicas
+        for (let i = 0; i < 2; i++) {
+          const vaga = vagasUnicasLivres.shift();
+          novosResultados.push({
+            vagaNumero: vaga.numero,
+            vagaLocalizacao: vaga.localizacao,
+            vagaTipo: vaga.tipo,
+            apartamentoNumero: apt.numero,
+            preConfigurada: false
+          });
+          apt.vagasAtribuidas.push(vaga);
+        }
+      } else {
+        throw new Error(`Não há vagas suficientes para o apartamento ${apt.numero}. Vagas duplas: ${vagasDuplasLivres.length}, Vagas únicas: ${vagasUnicasLivres.length}`);
       }
     }
 
-    // 5. Adicionar vagas que sobraram (não sorteadas)
+    // 6. Verificar se todos os apartamentos SEM regras têm vagas adequadas
+    const apartamentosSemVagasFinal = apartamentosSemRegras.filter(apt => {
+      const numVagas = apt.vagasAtribuidas.length;
+      const temVagaDupla = apt.vagasAtribuidas.some(v => v.tipo === 'DUPLA');
+      const numVagasUnicas = apt.vagasAtribuidas.filter(v => v.tipo === 'ÚNICA').length;
+      
+      return !(temVagaDupla || numVagasUnicas >= 2);
+    });
+
+    if (apartamentosSemVagasFinal.length > 0) {
+      const apartamentosSemVagas = apartamentosSemVagasFinal.map(apt => apt.numero).join(', ');
+      throw new Error(`Os seguintes apartamentos ficaram sem vagas adequadas: ${apartamentosSemVagas}`);
+    }
+
+    // 7. Adicionar vagas que sobraram (não sorteadas)
     vagasDuplasLivres.forEach(vaga => {
       novosResultados.push({
         vagaNumero: vaga.numero,
@@ -176,7 +263,7 @@ export const useSorteio = () => {
       'Número da Vaga': resultado.vagaNumero,
       'Localização': resultado.vagaLocalizacao,
       'Tipo': resultado.vagaTipo,
-      'Apartamento': resultado.apartamentoNumero || 'Não sorteada',
+      'Apartamento': resultado.apartamentoNumero || 'Não sorteada'
     }));
 
     return dadosExport;
@@ -202,6 +289,7 @@ export const useSorteio = () => {
     vagas,
     resultados,
     sorteioRealizado,
+    carregarDadosUnificados,
     carregarApartamentos,
     carregarVagas,
     realizarSorteio,
@@ -210,4 +298,3 @@ export const useSorteio = () => {
     getEstatisticas
   };
 };
-

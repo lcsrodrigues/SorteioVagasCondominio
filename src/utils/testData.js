@@ -1,32 +1,118 @@
-// Dados de teste para simular upload de arquivos Excel
+// Dados de teste baseados nos arquivos reais fornecidos (amostra para demonstração)
 
 export const testMoradores = [
   { Apartamento: 104 },
   { Apartamento: 105 },
   { Apartamento: 106 },
+  { Apartamento: 201 },
+  { Apartamento: 202 },
+  { Apartamento: 203 },
+  { Apartamento: 204 },
   { Apartamento: 205 },
+  { Apartamento: 206 },
+  { Apartamento: 301 },
   { Apartamento: 302 },
+  { Apartamento: 303 },
+  { Apartamento: 304 },
+  { Apartamento: 305 },
+  { Apartamento: 306 },
   { Apartamento: 401 },
+  { Apartamento: 402 },
+  { Apartamento: 403 },
+  { Apartamento: 404 },
+  { Apartamento: 405 },
+  { Apartamento: 406 },
+  { Apartamento: 501 },
   { Apartamento: 502 },
+  { Apartamento: 503 },
+  { Apartamento: 504 },
+  { Apartamento: 505 },
+  { Apartamento: 506 },
+  { Apartamento: 601 },
+  { Apartamento: 602 },
   { Apartamento: 603 },
+  { Apartamento: 604 },
+  { Apartamento: 605 },
+  { Apartamento: 606 },
+  { Apartamento: 701 },
+  { Apartamento: 702 },
+  { Apartamento: 703 },
   { Apartamento: 704 },
-  { Apartamento: 805 }
+  { Apartamento: 705 },
+  { Apartamento: 706 },
+  { Apartamento: 801 },
+  { Apartamento: 802 },
+  { Apartamento: 803 },
+  { Apartamento: 804 },
+  { Apartamento: 805 },
+  { Apartamento: 806 },
+  { Apartamento: 901 },
+  { Apartamento: 902 },
+  { Apartamento: 903 },
+  { Apartamento: 904 },
+  { Apartamento: 905 }
 ];
 
 export const testVagas = [
   { 'Número da Vaga': 1, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
   { 'Número da Vaga': 2, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
-  { 'Número da Vaga': 3, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '104' },
-  { 'Número da Vaga': 4, 'Localização': 'G1', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
-  { 'Número da Vaga': 5, 'Localização': 'G1', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '205' },
-  { 'Número da Vaga': 6, 'Localização': 'G2', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
-  { 'Número da Vaga': 7, 'Localização': 'G2', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
-  { 'Número da Vaga': 8, 'Localização': 'G3', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' }
+  { 'Número da Vaga': 3, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 4, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '201' },
+  { 'Número da Vaga': 5, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '202' },
+  { 'Número da Vaga': 6, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '2002' },
+  { 'Número da Vaga': 7, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 12, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 15, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '303' },
+  { 'Número da Vaga': 16, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 17, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '1105' },
+  { 'Número da Vaga': 18, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 19, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 20, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 21, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '1906' },
+  { 'Número da Vaga': 22, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 23, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 24, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 25, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '704' },
+  { 'Número da Vaga': 26, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '1001' },
+  { 'Número da Vaga': 27, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '505' },
+  { 'Número da Vaga': 28, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 29, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 30, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '801' },
+  { 'Número da Vaga': 31, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 32, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '104' },
+  { 'Número da Vaga': 33, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '1703' },
+  { 'Número da Vaga': 34, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '1201' },
+  { 'Número da Vaga': 35, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '1701' },
+  { 'Número da Vaga': 36, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 37, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '501' },
+  { 'Número da Vaga': 38, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '2006' },
+  { 'Número da Vaga': 39, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '1005' },
+  { 'Número da Vaga': 40, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '1301' },
+  { 'Número da Vaga': 41, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 42, 'Localização': 'TÉRREO', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 43, 'Localização': 'G1', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 44, 'Localização': 'G1', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 45, 'Localização': 'G1', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '105' },
+  { 'Número da Vaga': 46, 'Localização': 'G1', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '705' },
+  { 'Número da Vaga': 47, 'Localização': 'G1', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '2005' },
+  { 'Número da Vaga': 48, 'Localização': 'G1', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 49, 'Localização': 'G1', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '2104' },
+  { 'Número da Vaga': 50, 'Localização': 'G1', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '2105' },
+  { 'Número da Vaga': 51, 'Localização': 'G1', 'Tipo de Vaga': 'DUPLA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '1605' },
+  { 'Número da Vaga': 52, 'Localização': 'G1', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '203' },
+  { 'Número da Vaga': 53, 'Localização': 'G1', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'SIM', 'Apartamentos Elegíveis': '204' },
+  { 'Número da Vaga': 54, 'Localização': 'G1', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 55, 'Localização': 'G1', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 56, 'Localização': 'G1', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 57, 'Localização': 'G1', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 58, 'Localização': 'G1', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 59, 'Localização': 'G1', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' },
+  { 'Número da Vaga': 60, 'Localização': 'G1', 'Tipo de Vaga': 'ÚNICA', 'Pré-Selecionada': 'NÃO', 'Apartamentos Elegíveis': '' }
 ];
 
 // Função para simular upload de dados de teste
 export const loadTestData = (carregarApartamentos, carregarVagas) => {
-  console.log('Carregando dados de teste...');
+  console.log('Carregando dados de teste baseados nos arquivos reais...');
   
   const apartamentosCarregados = carregarApartamentos(testMoradores);
   console.log(`${apartamentosCarregados.length} apartamentos carregados`);
@@ -39,4 +125,3 @@ export const loadTestData = (carregarApartamentos, carregarVagas) => {
     vagas: vagasCarregadas.length
   };
 };
-
